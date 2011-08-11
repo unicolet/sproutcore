@@ -51,7 +51,11 @@ SC.View.reopen(
     @param {SC.Responder} responder
   */
   didBecomeKeyResponderFrom: function(responder) {
+    var time = new Date().getTime();
+    console.log('A. pausing in keyboard.js (check timestamps of grouping B. above)                                                       @ ' + time);
     this.$().focus();
+    time = new Date().getTime();
+    console.warn('C. continuing in keyboard.js (check timestamps of grouping B. above)                                                   @ ' + time);
   },
 
   /**

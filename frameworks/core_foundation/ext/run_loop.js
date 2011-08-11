@@ -152,6 +152,8 @@ SC.RunLoop = SC.RunLoop.extend(
     hence the need to lookup the current run loop.
   */
   _timeoutDidFire: function() {
+    var time = new Date().getTime();
+    console.warn('A. timer fired for beginTouchesInContent code in run_loop.js _timeoutDidFire                                          @ ' + time );
     var rl = SC.RunLoop.currentRunLoop;
     rl._timeout = rl._timeoutAt = null ; // cleanup
     SC.run();  // begin/end runloop to trigger timers.

@@ -904,7 +904,8 @@ SC.RootResponder = SC.Object.extend(
 
   assignTouch: function(touch, view) {
     // sanity-check
-    if (touch.hasEnded) throw "Attempt to assign a touch that is already finished.";
+    var time = new Date().getTime();
+    if (touch.hasEnded) throw "C. Attempt to assign a touch that is already finished.                                                                                 @ " + time;
 
     // unassign from old view if necessary
     if (touch.view === view) return;
@@ -1249,6 +1250,8 @@ SC.RootResponder = SC.Object.extend(
     touch.touchResponder = null;
     touch.nextTouchResponder = null;
     touch.hasEnded = YES;
+    var time = new Date().getTime();
+    console.log("B. ending touch (touch.hasEnded = YES) in root_responder.js finishTouch()                                             @ " + time);
 
     // and remove from our set
     if (this._touches[touch.identifier]) delete this._touches[touch.identifier];
@@ -1421,6 +1424,8 @@ SC.RootResponder = SC.Object.extend(
   },
 
   touchend: function(evt) {
+    var time = new Date().getTime();
+    console.warn('B. switching to handle touch in root_responder.js touchend                                                                         @ ' + time );
     var hidesTouchIntercept = NO;
 
     SC.run(function() {
@@ -1472,7 +1477,9 @@ SC.RootResponder = SC.Object.extend(
     if (hidesTouchIntercept) {
       return YES;
     }
-
+    time = new Date().getTime();
+    console.log('B. finished handling touch in root_responder.js touchend                                                                              @ ' + time );
+    
     return evt.hasCustomEventHandling;
   },
 

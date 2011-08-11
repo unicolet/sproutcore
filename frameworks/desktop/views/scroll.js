@@ -1102,6 +1102,8 @@ SC.ScrollView = SC.View.extend({
     // then the timer expires and starts a new Run Loop to call beginTouchesInContent(), that this.touch will STILL exist
     // here.  There's no explanation for it, and it's not 100% reproducible, but what happens is that if we try to capture
     // the touch that has already ended, assignTouch() in RootResponder will check touch.hasEnded and throw an exception.
+    var time = new Date().getTime();
+    if (touch && touch.touch) console.log("A. called scroll.js beginTouchesInContent()                                                                                                    @ " + time);
     
     // Therefore, don't capture a touch if the touch still exists and hasEnded
     if (touch && this.tracking && !this.dragging && !touch.touch.scrollHasEnded && !touch.touch.hasEnded) {
