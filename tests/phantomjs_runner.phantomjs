@@ -27,7 +27,8 @@ var travis=env['TRAVIS_JOB_ID']?env['TRAVIS_JOB_ID']:false,
     verbose=env['VERBOSE']?env['VERBOSE']:false,
     port=env['PORT']?env['PORT']:4020,
     host=env['IP']?env['IP']:"127.0.0.1",
-    filter=(args.length === 2 ? new RegExp(args[1]) : false);
+    filter=(args.length === 2 ? new RegExp(args[1]) : false),
+    snapshot_failed_tests = env['SNAPSHOT_FAILED_TESTS']==1?true:false;
 
 if(!travis && verbose) {
   page.onError = function(err, stack) {
@@ -512,6 +513,14 @@ var outcome=0;
 var failed=0;
 var webpage = require('webpage');
 
+function takeSnapshot(page, idx) {
+    if(snapshot_failed_tests && urls[idx].status!==SKIPPED && urls[idx].status!==TEST_PASSED) {
+        var path="/tmp/"+(idx+1)+".png";
+        console.log("\tsnapshot saved as: "+path);
+        page.render(path);
+    }
+}
+
 function logResult(r,i) {
     // output coloring
     var red, blue, reset;
@@ -578,6 +587,7 @@ function runTest(idx, cb) {
                           urls[idx].status=TEST_PASSED;
                         }
                         logResult(urls[idx], idx);
+                        takeSnapshot(page, idx);
                         page.close();
                         runTest(++idx,cb);
                     }
