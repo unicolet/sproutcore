@@ -111,6 +111,9 @@ test("should work with @each dependent keys", function() {
   }));
   array.provideLength(1);
 
+  // TODO: calling get('total') gets the right value unless caching is turned on.
+  // caching and notification will start working once we fix @each
+  // once and for all
   var obj = SC.Object.create({
     total: function() {
       return this.get('content').reduce(function(prev, item) {
@@ -135,6 +138,71 @@ test("should work with @each dependent keys", function() {
 
 });
 
+test("notification does not work yet with @each dependent keys", function() {
+  var array = SC.SparseArray.create();
+  var totalBeenNotified=0;
+
+  array.pushObject(SC.Object.create({
+    value: 5
+  }));
+  array.provideLength(1);
+
+  var obj = SC.Object.create({
+    totalDidChange: function (){
+        totalBeenNotified++;
+    }.observes("total"),
+      
+    total: function() {
+      return this.get('content').reduce(function(prev, item) {
+        return prev + item.get('value');
+      }, 0);
+    }.property('content.@each.value'),
+
+    content: array
+  });
+
+  array.pushObject(SC.Object.create({
+    value: 10
+  }));
+  equals(totalBeenNotified, 0, "not been notified when a child object has been pushed on the array");
+
+  array.objectAt(1).set('value', 15);
+
+  equals(totalBeenNotified, 0, "not been notified when value property on child object changes");
+});
+
+test("computed property does not work yet with @each dependent keys and cacheable", function() {
+  var array = SC.SparseArray.create();
+
+  array.pushObject(SC.Object.create({
+    value: 5
+  }));
+  array.provideLength(1);
+
+  var obj = SC.Object.create({  
+    total: function() {
+      return this.get('content').reduce(function(prev, item) {
+        return prev + item.get('value');
+      }, 0);
+    }.property('content.@each.value').cacheable(),
+
+    content: array
+  });
+
+  equals(obj.get('total'), 5, "precond - computes total of all objects");
+
+  array.pushObject(SC.Object.create({
+    value: 10
+  }));
+
+  // if @each worked total should have been 15 here
+  equals(obj.get('total'), 5, "recomputes when a new object is added");
+
+  array.objectAt(1).set('value', 15);
+
+  // if @each worked total should have been 20 here
+  equals(obj.get('total'), 5, "recomputes when value property on child object changes");
+});
 
 test("modifying a range should not require the rest of the array to refetch", function() {
   var del = {
